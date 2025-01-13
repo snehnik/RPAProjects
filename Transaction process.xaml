@@ -1,0 +1,1503 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="Process" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:av="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib" xmlns:sd="clr-namespace:System.Data;assembly=System.Data" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property sap2010:Annotation.AnnotationText="Transaction item to be processed." Name="in_TransactionItem" Type="InArgument(ui:QueueItem)" />
+    <x:Property sap2010:Annotation.AnnotationText="Dictionary structure to store configuration data of the process (settings, constants and assets)." Name="in_Config" Type="InArgument(scg:Dictionary(x:String, x:Object))" />
+    <x:Property Name="in_SqlConnection" Type="InArgument(ui:DatabaseConnection)" />
+    <x:Property Name="io_reportDictionary" Type="InOutArgument(scg:Dictionary(x:String, x:String))" />
+  </x:Members>
+  <mva:VisualBasic.Settings>
+    <x:Null />
+  </mva:VisualBasic.Settings>
+  <sap:VirtualizedContainerService.HintSize>2835,2368</sap:VirtualizedContainerService.HintSize>
+  <sap2010:WorkflowViewState.IdRef>ProcessTransaction_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <scg:List x:TypeArguments="x:String" Capacity="48">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>Microsoft.VisualBasic.CompilerServices</x:String>
+      <x:String>UiPath.Database</x:String>
+      <x:String>System.Xml.Serialization</x:String>
+      <x:String>System.Globalization</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.Activities.DynamicUpdate</x:String>
+    </scg:List>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="52">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualStudio.Services.Common</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.Database</AssemblyReference>
+      <AssemblyReference>System.Data.DataSetExtensions</AssemblyReference>
+      <AssemblyReference>System.Data.Entity</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>UiPath.Excel</AssemblyReference>
+      <AssemblyReference>UiPath.CV</AssemblyReference>
+      <AssemblyReference>System.Memory</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities.Design</AssemblyReference>
+      <AssemblyReference>UiPath.Mail</AssemblyReference>
+      <AssemblyReference>Microsoft.Bcl.AsyncInterfaces</AssemblyReference>
+      <AssemblyReference>System.Runtime.WindowsRuntime</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <sap:WorkflowViewStateService.ViewState>
+    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+      <x:Boolean x:Key="ShouldExpandAll">True</x:Boolean>
+    </scg:Dictionary>
+  </sap:WorkflowViewStateService.ViewState>
+  <Sequence sap2010:Annotation.AnnotationText="Invoke major steps of the business process, which are usually implemented by multiple subworkflows.&#xA;&#xA;If a BusinessRuleException is thrown, the transaction is skipped. &#xA;If another kind of exception occurs, the current transaction can be retried. " DisplayName="Process" sap:VirtualizedContainerService.HintSize="2845,2303" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <If sap2010:Annotation.AnnotationText="If this process is a NoDispatcher process then endOfQueue will never be triggered" Condition="[in_TransactionItem.Reference = &quot;endOfQueue&quot;]" DisplayName="Normal transaction or endOfQueue" sap:VirtualizedContainerService.HintSize="2803,2141" sap2010:WorkflowViewState.IdRef="If_1">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <If.Then>
+        <Flowchart DisplayName="endOfQueue" sap:VirtualizedContainerService.HintSize="634,636" sap2010:WorkflowViewState.IdRef="Flowchart_1">
+          <Flowchart.Variables>
+            <Variable x:TypeArguments="x:String" Name="reportPath" />
+          </Flowchart.Variables>
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+              <x:Boolean x:Key="IsPinned">False</x:Boolean>
+              <av:Point x:Key="ShapeLocation">270,2.5</av:Point>
+              <av:Size x:Key="ShapeSize">60,75</av:Size>
+              <av:PointCollection x:Key="ConnectorLocation">300,77.5 300,117.5</av:PointCollection>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <Flowchart.StartNode>
+            <x:Reference>__ReferenceID1</x:Reference>
+          </Flowchart.StartNode>
+          <FlowStep x:Name="__ReferenceID1">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <av:Point x:Key="ShapeLocation">169,117.5</av:Point>
+                <av:Size x:Key="ShapeSize">262,60</av:Size>
+                <av:PointCollection x:Key="ConnectorLocation">300,177.5 300,234.5</av:PointCollection>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+            <Assign DisplayName="assignReportPath" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_28">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[reportPath]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">[String.Format("{0}{1}\Reports\{2}_{3}.xlsx",in_Config("businessWorkFolder").ToString,in_Config("businessProcessName").ToString,in_Config("businessProcessName").ToString,System.DateTime.Today.ToString("dd-MM-yyyy"))]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <FlowStep.Next>
+              <FlowStep x:Name="__ReferenceID0">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <av:Point x:Key="ShapeLocation">200,234.5</av:Point>
+                    <av:Size x:Key="ShapeSize">200,52</av:Size>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+                <ui:SendExchangeMail ApplicationId="{x:Null}" Bcc="{x:Null}" Cc="{x:Null}" DirectoryId="{x:Null}" Domain="{x:Null}" From="{x:Null}" MailMessage="{x:Null}" Name="{x:Null}" Password="{x:Null}" Server="{x:Null}" TimeoutMS="{x:Null}" User="{x:Null}" AuthenticationMode="UserNameAndPassword" Body="[&quot;Web Portal Robot Report_&quot;+System.DateTime.Now.ToString(&quot;dd.MM.yyyy&quot;)]" DisplayName="Send Exchange Mail Message" EmailAutodiscover="[in_Config(&quot;robotMail&quot;).ToString]" ExchangeVersion="Exchange2007_SP1" sap:VirtualizedContainerService.HintSize="200,52" sap2010:WorkflowViewState.IdRef="SendExchangeMail_1" IsBodyHtml="False" IsDraft="False" SaveCopy="False" Subject="[&quot;Web Portal Robot Report_&quot;+System.DateTime.Now.ToString(&quot;dd.MM.yyyy&quot;)]" To="[in_Config(&quot;mailProcessOwner&quot;).ToString]">
+                  <ui:SendExchangeMail.Files>
+                    <InArgument x:TypeArguments="x:String">[reportPath]</InArgument>
+                  </ui:SendExchangeMail.Files>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                      <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                </ui:SendExchangeMail>
+              </FlowStep>
+            </FlowStep.Next>
+          </FlowStep>
+          <x:Reference>__ReferenceID0</x:Reference>
+        </Flowchart>
+      </If.Then>
+      <If.Else>
+        <Flowchart DisplayName="Transaction" sap:VirtualizedContainerService.HintSize="2124,1960" sap2010:WorkflowViewState.IdRef="Flowchart_2">
+          <Flowchart.Variables>
+            <Variable x:TypeArguments="sd:DataTable" Name="dtSQLQuery" />
+            <Variable x:TypeArguments="x:String" Name="customerReference" />
+            <Variable x:TypeArguments="x:String" Name="dateOrdered" />
+            <Variable x:TypeArguments="x:String" Name="referenceWeek" />
+            <Variable x:TypeArguments="x:String" Name="requestedWeek" />
+            <Variable x:TypeArguments="x:String" Name="deliveryDay" />
+            <Variable x:TypeArguments="x:String" Name="deliveryWeek" />
+            <Variable x:TypeArguments="x:String" Name="confirmationNumber" />
+            <Variable x:TypeArguments="x:String" Name="sqlConfirmationNumber" />
+            <Variable x:TypeArguments="x:String" Name="sqlConfirmedDelivery" />
+            <Variable x:TypeArguments="x:String" Name="sqlDeliveryWeek" />
+            <Variable x:TypeArguments="s:DateTime" Name="sqlDeliveryDay" />
+            <Variable x:TypeArguments="x:String" Name="sqlDelayReason" />
+            <Variable x:TypeArguments="x:String" Name="exceptionMessage" />
+            <Variable x:TypeArguments="x:String" Name="sqlCustomerAccount" />
+            <Variable x:TypeArguments="x:String" Name="newDeliveryWeek" />
+            <Variable x:TypeArguments="x:String" Name="calendarDeliveryDay" />
+            <Variable x:TypeArguments="x:String" Name="calendarDeliveryMonth" />
+            <Variable x:TypeArguments="x:String" Name="referenceYear" />
+            <Variable x:TypeArguments="x:Int32" sap2010:Annotation.AnnotationText="No of weeks allowed between current week and reference week without a confirmation number" Name="referenceCutoff" />
+            <Variable x:TypeArguments="x:Int32" Name="currentWeekOfYear" />
+            <Variable x:TypeArguments="x:String" Name="deliveryYear" />
+            <Variable x:TypeArguments="x:Boolean" Default="False" Name="changeFromBiggerToLower" />
+          </Flowchart.Variables>
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+              <av:Point x:Key="ShapeLocation">590,2.5</av:Point>
+              <av:Size x:Key="ShapeSize">60,75</av:Size>
+              <x:Boolean x:Key="IsPinned">False</x:Boolean>
+              <x:Double x:Key="Width">2089.64166666667</x:Double>
+              <x:Double x:Key="Height">1924.04</x:Double>
+              <av:PointCollection x:Key="ConnectorLocation">620,77.5 620,109.58</av:PointCollection>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <Flowchart.StartNode>
+            <x:Reference>__ReferenceID23</x:Reference>
+          </Flowchart.StartNode>
+          <FlowStep x:Name="__ReferenceID5">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <av:Point x:Key="ShapeLocation">520,217.5</av:Point>
+                <av:Size x:Key="ShapeSize">200,52</av:Size>
+                <av:PointCollection x:Key="ConnectorLocation">620,269.5 620,299.5 620.141666666667,299.5 620.141666666667,308.5</av:PointCollection>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+            <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke DB_GetRecordFromCustomerRef workflow" sap:VirtualizedContainerService.HintSize="200,52" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="DB\DB_GetRecordFromCustomerRef.xaml">
+              <ui:InvokeWorkflowFile.Arguments>
+                <InArgument x:TypeArguments="ui:DatabaseConnection" x:Key="in_sqlConnection">[in_SqlConnection]</InArgument>
+                <OutArgument x:TypeArguments="sd:DataTable" x:Key="out_queryOutput">[dtSQLQuery]</OutArgument>
+                <InArgument x:TypeArguments="x:String" x:Key="in_customerRef">[customerReference]</InArgument>
+              </ui:InvokeWorkflowFile.Arguments>
+              <sap:WorkflowViewStateService.ViewState>
+                <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                  <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                </scg:Dictionary>
+              </sap:WorkflowViewStateService.ViewState>
+            </ui:InvokeWorkflowFile>
+            <FlowStep.Next>
+              <FlowDecision x:Name="__ReferenceID7" Condition="[dtSQLQuery.Rows.Count = 1]" DisplayName="Flow Decision" sap:VirtualizedContainerService.HintSize="79,87" sap2010:WorkflowViewState.IdRef="FlowDecision_1">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                    <av:Point x:Key="ShapeLocation">580.641666666667,308.5</av:Point>
+                    <av:Size x:Key="ShapeSize">79,87</av:Size>
+                    <av:PointCollection x:Key="TrueConnector">580.641666666667,352 420,352 420,404.5</av:PointCollection>
+                    <av:PointCollection x:Key="FalseConnector">659.641666666667,352 780,352 780,386.5</av:PointCollection>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+                <FlowDecision.True>
+                  <FlowStep x:Name="__ReferenceID6">
+                    <sap:WorkflowViewStateService.ViewState>
+                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                        <av:Point x:Key="ShapeLocation">320,404.5</av:Point>
+                        <av:Size x:Key="ShapeSize">200,52</av:Size>
+                        <av:PointCollection x:Key="ConnectorLocation">520,430.5 600,430.5 600,608</av:PointCollection>
+                      </scg:Dictionary>
+                    </sap:WorkflowViewStateService.ViewState>
+                    <ui:MultipleAssign DisplayName="sqlAssigns" sap:VirtualizedContainerService.HintSize="200,52" sap2010:WorkflowViewState.IdRef="MultipleAssign_1">
+                      <ui:MultipleAssign.AssignOperations>
+                        <scg:List x:TypeArguments="ui:AssignOperation" Capacity="8">
+                          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_1">
+                            <ui:AssignOperation.To>
+                              <OutArgument x:TypeArguments="x:String">[sqlConfirmationNumber]</OutArgument>
+                            </ui:AssignOperation.To>
+                            <ui:AssignOperation.Value>
+                              <InArgument x:TypeArguments="x:String">[dtSQLQuery(0)("SALESID").ToString]</InArgument>
+                            </ui:AssignOperation.Value>
+                          </ui:AssignOperation>
+                          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_2">
+                            <ui:AssignOperation.To>
+                              <OutArgument x:TypeArguments="x:String">[sqlConfirmedDelivery]</OutArgument>
+                            </ui:AssignOperation.To>
+                            <ui:AssignOperation.Value>
+                              <InArgument x:TypeArguments="x:String">[dtSQLQuery(0)("CONFIRMEDDLV").ToString]</InArgument>
+                            </ui:AssignOperation.Value>
+                          </ui:AssignOperation>
+                          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_3">
+                            <ui:AssignOperation.To>
+                              <OutArgument x:TypeArguments="x:String">[sqlDeliveryWeek]</OutArgument>
+                            </ui:AssignOperation.To>
+                            <ui:AssignOperation.Value>
+                              <InArgument x:TypeArguments="x:String">[dtSQLQuery(0)("delivery_date").ToString.Substring(dtSQLQuery(0)("delivery_date").ToString.IndexOf("-")+1)]</InArgument>
+                            </ui:AssignOperation.Value>
+                          </ui:AssignOperation>
+                          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_4">
+                            <ui:AssignOperation.To>
+                              <OutArgument x:TypeArguments="s:DateTime">[sqlDeliveryDay]</OutArgument>
+                            </ui:AssignOperation.To>
+                            <ui:AssignOperation.Value>
+                              <InArgument x:TypeArguments="s:DateTime">[System.DateTime.ParseExact(dtSQLQuery(0)("ReceiptDateConfirmed").ToString, "MM/dd/yyyy hh:mm:ss",nothing)]</InArgument>
+                            </ui:AssignOperation.Value>
+                          </ui:AssignOperation>
+                          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_5">
+                            <ui:AssignOperation.To>
+                              <OutArgument x:TypeArguments="x:String">[sqlDelayReason]</OutArgument>
+                            </ui:AssignOperation.To>
+                            <ui:AssignOperation.Value>
+                              <InArgument x:TypeArguments="x:String">[dtSQLQuery(0)("FIT_ReasonForDelayId").ToString]</InArgument>
+                            </ui:AssignOperation.Value>
+                          </ui:AssignOperation>
+                          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_6">
+                            <ui:AssignOperation.To>
+                              <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Confirmation Number")]</OutArgument>
+                            </ui:AssignOperation.To>
+                            <ui:AssignOperation.Value>
+                              <InArgument x:TypeArguments="x:String">[sqlConfirmationNumber]</InArgument>
+                            </ui:AssignOperation.Value>
+                          </ui:AssignOperation>
+                          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_7">
+                            <ui:AssignOperation.To>
+                              <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Delay Reason")]</OutArgument>
+                            </ui:AssignOperation.To>
+                            <ui:AssignOperation.Value>
+                              <InArgument x:TypeArguments="x:String">[sqlDelayReason]</InArgument>
+                            </ui:AssignOperation.Value>
+                          </ui:AssignOperation>
+                          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_8">
+                            <ui:AssignOperation.To>
+                              <OutArgument x:TypeArguments="x:String">[deliveryYear]</OutArgument>
+                            </ui:AssignOperation.To>
+                            <ui:AssignOperation.Value>
+                              <InArgument x:TypeArguments="x:String">[dtSQLQuery(0)("delivery_date").ToString.Substring(0,4)]</InArgument>
+                            </ui:AssignOperation.Value>
+                          </ui:AssignOperation>
+                        </scg:List>
+                      </ui:MultipleAssign.AssignOperations>
+                      <sap:WorkflowViewStateService.ViewState>
+                        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                        </scg:Dictionary>
+                      </sap:WorkflowViewStateService.ViewState>
+                    </ui:MultipleAssign>
+                    <FlowStep.Next>
+                      <FlowStep x:Name="__ReferenceID12">
+                        <sap:WorkflowViewStateService.ViewState>
+                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                            <av:Point x:Key="ShapeLocation">469,608</av:Point>
+                            <av:Size x:Key="ShapeSize">262,60</av:Size>
+                            <av:PointCollection x:Key="ConnectorLocation">600,668 600,776.5</av:PointCollection>
+                          </scg:Dictionary>
+                        </sap:WorkflowViewStateService.ViewState>
+                        <Assign sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_20">
+                          <Assign.To>
+                            <OutArgument x:TypeArguments="x:String">[sqlDeliveryWeek]</OutArgument>
+                          </Assign.To>
+                          <Assign.Value>
+                            <InArgument x:TypeArguments="x:String">[(Convert.ToInt32(sqlDeliveryweek)).ToString]</InArgument>
+                          </Assign.Value>
+                          <sap:WorkflowViewStateService.ViewState>
+                            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                            </scg:Dictionary>
+                          </sap:WorkflowViewStateService.ViewState>
+                        </Assign>
+                        <FlowStep.Next>
+                          <FlowDecision x:Name="__ReferenceID14" Condition="[in_TransactionItem.Reference.ToUpper.Equals(&quot;ORDER&quot;)]" DisplayName="Flow Decision" sap:VirtualizedContainerService.HintSize="79,87" sap2010:WorkflowViewState.IdRef="FlowDecision_16">
+                            <sap:WorkflowViewStateService.ViewState>
+                              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                <av:Point x:Key="ShapeLocation">560.5,776.5</av:Point>
+                                <av:Size x:Key="ShapeSize">79,87</av:Size>
+                                <av:PointCollection x:Key="TrueConnector">560.5,820 530.5,820 530.5,831 370,831</av:PointCollection>
+                                <av:PointCollection x:Key="FalseConnector">639.5,820 669.5,820 669.5,776.5 1007,776.5 1007,806.5</av:PointCollection>
+                              </scg:Dictionary>
+                            </sap:WorkflowViewStateService.ViewState>
+                            <FlowDecision.True>
+                              <FlowStep x:Name="__ReferenceID13">
+                                <sap:WorkflowViewStateService.ViewState>
+                                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                    <av:Point x:Key="ShapeLocation">170,797</av:Point>
+                                    <av:Size x:Key="ShapeSize">200,68</av:Size>
+                                  </scg:Dictionary>
+                                </sap:WorkflowViewStateService.ViewState>
+                                <Sequence DisplayName="ProcessOrders" sap:VirtualizedContainerService.HintSize="200,68" sap2010:WorkflowViewState.IdRef="Sequence_20">
+                                  <sap:WorkflowViewStateService.ViewState>
+                                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                    </scg:Dictionary>
+                                  </sap:WorkflowViewStateService.ViewState>
+                                  <If Condition="[String.IsNullOrEmpty(sqlConfirmationNumber)]" sap:VirtualizedContainerService.HintSize="879,1259" sap2010:WorkflowViewState.IdRef="If_12">
+                                    <If.Then>
+                                      <Sequence sap:VirtualizedContainerService.HintSize="376,285" sap2010:WorkflowViewState.IdRef="Sequence_18">
+                                        <sap:WorkflowViewStateService.ViewState>
+                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                          </scg:Dictionary>
+                                        </sap:WorkflowViewStateService.ViewState>
+                                        <Assign DisplayName="assignDictionaryErrorReferenceClose" sap:VirtualizedContainerService.HintSize="334,60" sap2010:WorkflowViewState.IdRef="Assign_44">
+                                          <Assign.To>
+                                            <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Error Message")]</OutArgument>
+                                          </Assign.To>
+                                          <Assign.Value>
+                                            <InArgument x:TypeArguments="x:String">[String.Format("No confirmation number")]</InArgument>
+                                          </Assign.Value>
+                                        </Assign>
+                                        <ui:LogMessage DisplayName="warn_NoConfirmationNumber" sap:VirtualizedContainerService.HintSize="334,93" sap2010:WorkflowViewState.IdRef="LogMessage_8" Level="Error" Message="[String.Format(&quot;No confirmation number&quot;)]" />
+                                      </Sequence>
+                                    </If.Then>
+                                    <If.Else>
+                                      <Sequence sap:VirtualizedContainerService.HintSize="458,1109" sap2010:WorkflowViewState.IdRef="Sequence_39">
+                                        <sap:WorkflowViewStateService.ViewState>
+                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                          </scg:Dictionary>
+                                        </sap:WorkflowViewStateService.ViewState>
+                                        <Sequence sap:VirtualizedContainerService.HintSize="416,917" sap2010:WorkflowViewState.IdRef="Sequence_41">
+                                          <sap:WorkflowViewStateService.ViewState>
+                                            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                            </scg:Dictionary>
+                                          </sap:WorkflowViewStateService.ViewState>
+                                          <Assign DisplayName="dictionaryConfirmationNumber" sap:VirtualizedContainerService.HintSize="374,60" sap2010:WorkflowViewState.IdRef="Assign_79">
+                                            <Assign.To>
+                                              <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Confirmation number")]</OutArgument>
+                                            </Assign.To>
+                                            <Assign.Value>
+                                              <InArgument x:TypeArguments="x:String">[sqlConfirmationNumber]</InArgument>
+                                            </Assign.Value>
+                                          </Assign>
+                                          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WebPortal_NavigateToMyOrders workflow" sap:VirtualizedContainerService.HintSize="374,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_56" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="WebPortal\WebPortal_NavigateToMyOrders.xaml">
+                                            <ui:InvokeWorkflowFile.Arguments>
+                                              <scg:Dictionary x:TypeArguments="x:String, Argument" />
+                                            </ui:InvokeWorkflowFile.Arguments>
+                                            <sap:WorkflowViewStateService.ViewState>
+                                              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                              </scg:Dictionary>
+                                            </sap:WorkflowViewStateService.ViewState>
+                                          </ui:InvokeWorkflowFile>
+                                          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WebPortal_CheckFilters workflow" sap:VirtualizedContainerService.HintSize="374,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_57" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="WebPortal\WebPortal_CheckFilters.xaml">
+                                            <ui:InvokeWorkflowFile.Arguments>
+                                              <InArgument x:TypeArguments="x:String" x:Key="in_OrderOrDelivery">[in_TransactionItem.Reference]</InArgument>
+                                            </ui:InvokeWorkflowFile.Arguments>
+                                            <sap:WorkflowViewStateService.ViewState>
+                                              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                              </scg:Dictionary>
+                                            </sap:WorkflowViewStateService.ViewState>
+                                          </ui:InvokeWorkflowFile>
+                                          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WebPortal_SearchOrderOrDelivery workflow" sap:VirtualizedContainerService.HintSize="374,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_58" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="WebPortal\WebPortal_SearchOrderOrDelivery.xaml">
+                                            <ui:InvokeWorkflowFile.Arguments>
+                                              <InArgument x:TypeArguments="x:String" x:Key="in_OrderOrDelivery">[in_TransactionItem.Reference]</InArgument>
+                                              <InArgument x:TypeArguments="x:String" x:Key="in_CustomerReference">[customerReference]</InArgument>
+                                            </ui:InvokeWorkflowFile.Arguments>
+                                            <sap:WorkflowViewStateService.ViewState>
+                                              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                              </scg:Dictionary>
+                                            </sap:WorkflowViewStateService.ViewState>
+                                          </ui:InvokeWorkflowFile>
+                                          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WebPortal_FillOrder workflow" sap:VirtualizedContainerService.HintSize="374,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_59" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="WebPortal\WebPortal_FillOrder.xaml">
+                                            <ui:InvokeWorkflowFile.Arguments>
+                                              <InArgument x:TypeArguments="x:String" x:Key="in_ConfirmationNumber">[sqlConfirmationNumber]</InArgument>
+                                              <InArgument x:TypeArguments="x:String" x:Key="in_DeliveryWeek">[sqlDeliveryWeek]</InArgument>
+                                              <InArgument x:TypeArguments="x:String" x:Key="in_Reason">[sqlDelayReason]</InArgument>
+                                            </ui:InvokeWorkflowFile.Arguments>
+                                            <sap:WorkflowViewStateService.ViewState>
+                                              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                              </scg:Dictionary>
+                                            </sap:WorkflowViewStateService.ViewState>
+                                          </ui:InvokeWorkflowFile>
+                                          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WebPortal_ResetPage workflow" sap:VirtualizedContainerService.HintSize="374,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_60" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="WebPortal\WebPortal_ResetPage.xaml">
+                                            <ui:InvokeWorkflowFile.Arguments>
+                                              <InArgument x:TypeArguments="x:String" x:Key="in_OrderOrDelivery">[in_TransactionItem.Reference]</InArgument>
+                                            </ui:InvokeWorkflowFile.Arguments>
+                                            <sap:WorkflowViewStateService.ViewState>
+                                              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                              </scg:Dictionary>
+                                            </sap:WorkflowViewStateService.ViewState>
+                                          </ui:InvokeWorkflowFile>
+                                        </Sequence>
+                                        <Assign DisplayName="dictionaryConfirmationNumber" sap:VirtualizedContainerService.HintSize="416,60" sap2010:WorkflowViewState.IdRef="Assign_76">
+                                          <Assign.To>
+                                            <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Confirmation number")]</OutArgument>
+                                          </Assign.To>
+                                          <Assign.Value>
+                                            <InArgument x:TypeArguments="x:String">[sqlConfirmationNumber]</InArgument>
+                                          </Assign.Value>
+                                        </Assign>
+                                      </Sequence>
+                                    </If.Else>
+                                  </If>
+                                </Sequence>
+                              </FlowStep>
+                            </FlowDecision.True>
+                            <FlowDecision.False>
+                              <FlowDecision x:Name="__ReferenceID18" Condition="[not String.IsNullOrEmpty(sqlDeliveryWeek)]" DisplayName="sqlDeliveryWeekNotEmpty" sap:VirtualizedContainerService.HintSize="146,87" sap2010:WorkflowViewState.IdRef="FlowDecision_18">
+                                <sap:WorkflowViewStateService.ViewState>
+                                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                    <av:Point x:Key="ShapeLocation">970.5,806.5</av:Point>
+                                    <av:Size x:Key="ShapeSize">146,87</av:Size>
+                                    <av:PointCollection x:Key="FalseConnector">1116.5,850 1290,850 1290,1501 1260,1501</av:PointCollection>
+                                    <av:PointCollection x:Key="TrueConnector">970.5,850 886.5,850 886.5,896.5</av:PointCollection>
+                                  </scg:Dictionary>
+                                </sap:WorkflowViewStateService.ViewState>
+                                <FlowDecision.True>
+                                  <FlowDecision x:Name="__ReferenceID19" Condition="[not deliveryWeek.Equals(sqlDeliveryWeek)]" DisplayName="DeliveryWeeksNotEqual" sap:VirtualizedContainerService.HintSize="132,87" sap2010:WorkflowViewState.IdRef="FlowDecision_17">
+                                    <sap:WorkflowViewStateService.ViewState>
+                                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                        <av:Point x:Key="ShapeLocation">820.5,896.5</av:Point>
+                                        <av:Size x:Key="ShapeSize">132,87</av:Size>
+                                        <av:PointCollection x:Key="FalseConnector">952.5,940 1160,940 1160,1467</av:PointCollection>
+                                        <av:PointCollection x:Key="TrueConnector">820.5,940 718.25,940 718.25,1019</av:PointCollection>
+                                      </scg:Dictionary>
+                                    </sap:WorkflowViewStateService.ViewState>
+                                    <FlowDecision.True>
+                                      <FlowDecision x:Name="__ReferenceID20" Condition="[Convert.ToInt32(deliveryWeek.Substring(deliveryWeek.indexof(&quot;-&quot;) + 1)) &gt; Convert.ToInt32(sqlDeliveryWeek.Substring(sqlDeliveryWeek.indexof(&quot;-&quot;) + 1))]" DisplayName="WPWeek&gt;DBWWeek" sap:VirtualizedContainerService.HintSize="117,87" sap2010:WorkflowViewState.IdRef="FlowDecision_20">
+                                        <sap:WorkflowViewStateService.ViewState>
+                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                            <av:Point x:Key="ShapeLocation">630.5,1019</av:Point>
+                                            <av:Size x:Key="ShapeSize">117,87</av:Size>
+                                            <av:PointCollection x:Key="TrueConnector">630.5,1062.5 530.5,1062.5 530.5,1096.5</av:PointCollection>
+                                            <av:PointCollection x:Key="FalseConnector">747.5,1062.5 777.5,1062.5 777.5,1290 770,1290</av:PointCollection>
+                                          </scg:Dictionary>
+                                        </sap:WorkflowViewStateService.ViewState>
+                                        <FlowDecision.True>
+                                          <FlowDecision x:Name="__ReferenceID21" Condition="[Convert.ToInt32(deliveryWeek.Substring(deliveryWeek.indexof(&quot;-&quot;) + 1))  - Convert.ToInt32(sqlDeliveryWeek.Substring(sqlDeliveryWeek.indexof(&quot;-&quot;) + 1)) &gt; 1]" DisplayName="Difference&gt;1?" sap:VirtualizedContainerService.HintSize="80,87" sap2010:WorkflowViewState.IdRef="FlowDecision_19">
+                                            <sap:WorkflowViewStateService.ViewState>
+                                              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                <av:Point x:Key="ShapeLocation">490.5,1096.5</av:Point>
+                                                <av:Size x:Key="ShapeSize">80,87</av:Size>
+                                                <av:PointCollection x:Key="TrueConnector">490.5,1140 369.895,1140 369.895,1200</av:PointCollection>
+                                                <av:PointCollection x:Key="FalseConnector">570.5,1140 1160,1140 1160,1467</av:PointCollection>
+                                              </scg:Dictionary>
+                                            </sap:WorkflowViewStateService.ViewState>
+                                            <FlowDecision.True>
+                                              <FlowStep x:Name="__ReferenceID22">
+                                                <sap:WorkflowViewStateService.ViewState>
+                                                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                    <av:Point x:Key="ShapeLocation">238.895,1200</av:Point>
+                                                    <av:Size x:Key="ShapeSize">262,60</av:Size>
+                                                    <av:PointCollection x:Key="ConnectorLocation">369.895,1260 369.895,1290 570,1290</av:PointCollection>
+                                                  </scg:Dictionary>
+                                                </sap:WorkflowViewStateService.ViewState>
+                                                <Assign DisplayName="changeFromBiggerToLower" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_84">
+                                                  <Assign.To>
+                                                    <OutArgument x:TypeArguments="x:Boolean">[changeFromBiggerToLower]</OutArgument>
+                                                  </Assign.To>
+                                                  <Assign.Value>
+                                                    <InArgument x:TypeArguments="x:Boolean">True</InArgument>
+                                                  </Assign.Value>
+                                                  <sap:WorkflowViewStateService.ViewState>
+                                                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                      <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                                                    </scg:Dictionary>
+                                                  </sap:WorkflowViewStateService.ViewState>
+                                                </Assign>
+                                                <FlowStep.Next>
+                                                  <FlowStep x:Name="__ReferenceID3">
+                                                    <sap:WorkflowViewStateService.ViewState>
+                                                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                        <av:Point x:Key="ShapeLocation">570,1256</av:Point>
+                                                        <av:Size x:Key="ShapeSize">200,68</av:Size>
+                                                        <av:PointCollection x:Key="ConnectorLocation">670,1324 670,1500 1060,1500</av:PointCollection>
+                                                      </scg:Dictionary>
+                                                    </sap:WorkflowViewStateService.ViewState>
+                                                    <Sequence DisplayName="changeDeliveries" sap:VirtualizedContainerService.HintSize="200,68" sap2010:WorkflowViewState.IdRef="Sequence_47">
+                                                      <sap:WorkflowViewStateService.ViewState>
+                                                        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                        </scg:Dictionary>
+                                                      </sap:WorkflowViewStateService.ViewState>
+                                                      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WebPortal_NavigateToMyOrders workflow" sap:VirtualizedContainerService.HintSize="484,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_61" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="WebPortal\WebPortal_NavigateToMyOrders.xaml">
+                                                        <ui:InvokeWorkflowFile.Arguments>
+                                                          <scg:Dictionary x:TypeArguments="x:String, Argument" />
+                                                        </ui:InvokeWorkflowFile.Arguments>
+                                                      </ui:InvokeWorkflowFile>
+                                                      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WebPortal_CheckFilters workflow" sap:VirtualizedContainerService.HintSize="484,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_62" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="WebPortal\WebPortal_CheckFilters.xaml">
+                                                        <ui:InvokeWorkflowFile.Arguments>
+                                                          <InArgument x:TypeArguments="x:String" x:Key="in_OrderOrDelivery">[in_TransactionItem.Reference]</InArgument>
+                                                        </ui:InvokeWorkflowFile.Arguments>
+                                                      </ui:InvokeWorkflowFile>
+                                                      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WebPortal_SearchOrderOrDelivery workflow" sap:VirtualizedContainerService.HintSize="484,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_63" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="WebPortal\WebPortal_SearchOrderOrDelivery.xaml">
+                                                        <ui:InvokeWorkflowFile.Arguments>
+                                                          <InArgument x:TypeArguments="x:String" x:Key="in_OrderOrDelivery">Order</InArgument>
+                                                          <InArgument x:TypeArguments="x:String" x:Key="in_CustomerReference">[customerReference]</InArgument>
+                                                        </ui:InvokeWorkflowFile.Arguments>
+                                                        <sap:WorkflowViewStateService.ViewState>
+                                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                          </scg:Dictionary>
+                                                        </sap:WorkflowViewStateService.ViewState>
+                                                      </ui:InvokeWorkflowFile>
+                                                      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WebPortal_UnlockOrders workflow" sap:VirtualizedContainerService.HintSize="484,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_64" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="WebPortal\WebPortal_UnlockOrders.xaml">
+                                                        <ui:InvokeWorkflowFile.Arguments>
+                                                          <scg:Dictionary x:TypeArguments="x:String, Argument" />
+                                                        </ui:InvokeWorkflowFile.Arguments>
+                                                        <sap:WorkflowViewStateService.ViewState>
+                                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                          </scg:Dictionary>
+                                                        </sap:WorkflowViewStateService.ViewState>
+                                                      </ui:InvokeWorkflowFile>
+                                                      <If Condition="[String.IsNullOrEmpty(sqlDelayReason) and not changeFromBiggerToLower]" DisplayName="IfNoReason" sap:VirtualizedContainerService.HintSize="484,210" sap2010:WorkflowViewState.IdRef="If_23">
+                                                        <If.Then>
+                                                          <Assign sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_83">
+                                                            <Assign.To>
+                                                              <OutArgument x:TypeArguments="x:String">[sqlDelayReason]</OutArgument>
+                                                            </Assign.To>
+                                                            <Assign.Value>
+                                                              <InArgument x:TypeArguments="x:String">Missing Production</InArgument>
+                                                            </Assign.Value>
+                                                          </Assign>
+                                                        </If.Then>
+                                                      </If>
+                                                      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WebPortal_FillOrder workflow" sap:VirtualizedContainerService.HintSize="484,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_65" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="WebPortal\WebPortal_FillOrder.xaml">
+                                                        <ui:InvokeWorkflowFile.Arguments>
+                                                          <InArgument x:TypeArguments="x:String" x:Key="in_ConfirmationNumber" />
+                                                          <InArgument x:TypeArguments="x:String" x:Key="in_DeliveryWeek">[sqlDeliveryWeek]</InArgument>
+                                                          <InArgument x:TypeArguments="x:String" x:Key="in_Reason">[sqlDelayReason]</InArgument>
+                                                        </ui:InvokeWorkflowFile.Arguments>
+                                                        <sap:WorkflowViewStateService.ViewState>
+                                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                          </scg:Dictionary>
+                                                        </sap:WorkflowViewStateService.ViewState>
+                                                      </ui:InvokeWorkflowFile>
+                                                      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WebPortal_ResetPage workflow" sap:VirtualizedContainerService.HintSize="484,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_66" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="WebPortal\WebPortal_ResetPage.xaml">
+                                                        <ui:InvokeWorkflowFile.Arguments>
+                                                          <InArgument x:TypeArguments="x:String" x:Key="in_OrderOrDelivery">[in_TransactionItem.Reference]</InArgument>
+                                                        </ui:InvokeWorkflowFile.Arguments>
+                                                        <sap:WorkflowViewStateService.ViewState>
+                                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                          </scg:Dictionary>
+                                                        </sap:WorkflowViewStateService.ViewState>
+                                                      </ui:InvokeWorkflowFile>
+                                                    </Sequence>
+                                                    <FlowStep.Next>
+                                                      <FlowStep x:Name="__ReferenceID2">
+                                                        <sap:WorkflowViewStateService.ViewState>
+                                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                            <av:Point x:Key="ShapeLocation">1060,1467</av:Point>
+                                                            <av:Size x:Key="ShapeSize">200,68</av:Size>
+                                                            <av:PointCollection x:Key="ConnectorLocation">1160,1535 1160,1566.5</av:PointCollection>
+                                                          </scg:Dictionary>
+                                                        </sap:WorkflowViewStateService.ViewState>
+                                                        <Sequence DisplayName="checkIfDeliveryDay" sap:VirtualizedContainerService.HintSize="200,68" sap2010:WorkflowViewState.IdRef="Sequence_26">
+                                                          <sap:WorkflowViewStateService.ViewState>
+                                                            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                            </scg:Dictionary>
+                                                          </sap:WorkflowViewStateService.ViewState>
+                                                          <If Condition="[sqlDeliveryDay.Year &lt;&gt; 1900]" DisplayName="ifYearIsDifferentFrom1900" sap:VirtualizedContainerService.HintSize="2451,1286" sap2010:WorkflowViewState.IdRef="If_18">
+                                                            <If.Then>
+                                                              <If Condition="[sqlDeliveryDay &lt;= System.DateTime.Today]" DisplayName="ifDateOlder" sap:VirtualizedContainerService.HintSize="2030,1136" sap2010:WorkflowViewState.IdRef="If_17">
+                                                                <If.Then>
+                                                                  <Sequence sap:VirtualizedContainerService.HintSize="376,385" sap2010:WorkflowViewState.IdRef="Sequence_21">
+                                                                    <sap:WorkflowViewStateService.ViewState>
+                                                                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                      </scg:Dictionary>
+                                                                    </sap:WorkflowViewStateService.ViewState>
+                                                                    <Assign DisplayName="assignDictError" sap:VirtualizedContainerService.HintSize="334,60" sap2010:WorkflowViewState.IdRef="Assign_45">
+                                                                      <Assign.To>
+                                                                        <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Error Message")]</OutArgument>
+                                                                      </Assign.To>
+                                                                      <Assign.Value>
+                                                                        <InArgument x:TypeArguments="x:String">[String.Format("Delivery Day is before current day: {0}", sqlDeliveryDay.ToString)]</InArgument>
+                                                                      </Assign.Value>
+                                                                    </Assign>
+                                                                    <ui:LogMessage DisplayName="warn_old_day" sap:VirtualizedContainerService.HintSize="334,93" sap2010:WorkflowViewState.IdRef="LogMessage_9" Level="Warn" Message="[String.Format(&quot;Delivery Day is before current day: {0}&quot;, sqlDeliveryDay.ToString)]" />
+                                                                    <Assign DisplayName="deliveryDayIsNothing" sap:VirtualizedContainerService.HintSize="334,60" sap2010:WorkflowViewState.IdRef="Assign_46">
+                                                                      <Assign.To>
+                                                                        <OutArgument x:TypeArguments="s:DateTime">[sqlDeliveryDay]</OutArgument>
+                                                                      </Assign.To>
+                                                                      <Assign.Value>
+                                                                        <InArgument x:TypeArguments="s:DateTime">[datetime.MinValue]</InArgument>
+                                                                      </Assign.Value>
+                                                                    </Assign>
+                                                                  </Sequence>
+                                                                </If.Then>
+                                                                <If.Else>
+                                                                  <Sequence sap:VirtualizedContainerService.HintSize="1609,986" sap2010:WorkflowViewState.IdRef="Sequence_24">
+                                                                    <sap:WorkflowViewStateService.ViewState>
+                                                                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                      </scg:Dictionary>
+                                                                    </sap:WorkflowViewStateService.ViewState>
+                                                                    <If Condition="[not String.IsNullOrEmpty(DeliveryDay)]" DisplayName="ifDeliveryDayIsGreaterThanSQLDeliveryDay" sap:VirtualizedContainerService.HintSize="1567,894" sap2010:WorkflowViewState.IdRef="If_16">
+                                                                      <If.Then>
+                                                                        <Sequence sap:VirtualizedContainerService.HintSize="478,647" sap2010:WorkflowViewState.IdRef="Sequence_42">
+                                                                          <sap:WorkflowViewStateService.ViewState>
+                                                                            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                              <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                                                                            </scg:Dictionary>
+                                                                          </sap:WorkflowViewStateService.ViewState>
+                                                                          <ui:CommentOut DisplayName="Comment Out" sap:VirtualizedContainerService.HintSize="436,222" sap2010:WorkflowViewState.IdRef="CommentOut_1">
+                                                                            <ui:CommentOut.Body>
+                                                                              <Sequence DisplayName="Ignored Activities" sap:VirtualizedContainerService.HintSize="242,144" sap2010:WorkflowViewState.IdRef="Sequence_49">
+                                                                                <sap:WorkflowViewStateService.ViewState>
+                                                                                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                                  </scg:Dictionary>
+                                                                                </sap:WorkflowViewStateService.ViewState>
+                                                                                <If Condition="[Date.ParseExact(DeliveryDay.Substring(0,10),&quot;dd-MM-yyyy&quot;,nothing) &gt; sqlDeliveryDay]" DisplayName="ifDeliveryDayWebPortalGreaterThanSQLDeliveryDay" sap:VirtualizedContainerService.HintSize="200,52" sap2010:WorkflowViewState.IdRef="If_15">
+                                                                                  <sap:WorkflowViewStateService.ViewState>
+                                                                                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                                      <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                                                                                      <x:Boolean x:Key="IsPinned">True</x:Boolean>
+                                                                                    </scg:Dictionary>
+                                                                                  </sap:WorkflowViewStateService.ViewState>
+                                                                                  <If.Then>
+                                                                                    <Sequence sap:VirtualizedContainerService.HintSize="304,252" sap2010:WorkflowViewState.IdRef="Sequence_33">
+                                                                                      <sap:WorkflowViewStateService.ViewState>
+                                                                                        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                                          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                                        </scg:Dictionary>
+                                                                                      </sap:WorkflowViewStateService.ViewState>
+                                                                                      <Assign DisplayName="assignDateWebPortalGreater" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_47">
+                                                                                        <Assign.To>
+                                                                                          <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Error Message")]</OutArgument>
+                                                                                        </Assign.To>
+                                                                                        <Assign.Value>
+                                                                                          <InArgument x:TypeArguments="x:String">[String.Format("The date in webportal :{0} is greater than the delivery day in AX database",DeliveryDay.Substring(0,10),sqlDeliveryDay.ToString("dd-MM-yyyy"))]</InArgument>
+                                                                                        </Assign.Value>
+                                                                                      </Assign>
+                                                                                      <Assign DisplayName="deliveryDayIsNothing" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_70">
+                                                                                        <Assign.To>
+                                                                                          <OutArgument x:TypeArguments="s:DateTime">[sqlDeliveryDay]</OutArgument>
+                                                                                        </Assign.To>
+                                                                                        <Assign.Value>
+                                                                                          <InArgument x:TypeArguments="s:DateTime">[datetime.MinValue]</InArgument>
+                                                                                        </Assign.Value>
+                                                                                      </Assign>
+                                                                                    </Sequence>
+                                                                                  </If.Then>
+                                                                                  <If.Else>
+                                                                                    <If Condition="[convert.ToInt32(deliveryWeek) - currentWeekOfYear &gt; 2]" DisplayName="if2WeeksApart" sap:VirtualizedContainerService.HintSize="1393,891" sap2010:WorkflowViewState.IdRef="If_14">
+                                                                                      <If.Then>
+                                                                                        <Sequence sap:VirtualizedContainerService.HintSize="304,252" sap2010:WorkflowViewState.IdRef="Sequence_34">
+                                                                                          <sap:WorkflowViewStateService.ViewState>
+                                                                                            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                                              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                                            </scg:Dictionary>
+                                                                                          </sap:WorkflowViewStateService.ViewState>
+                                                                                          <Assign DisplayName="assignDateWebPortalGreater" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_48">
+                                                                                            <Assign.To>
+                                                                                              <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Error Message")]</OutArgument>
+                                                                                            </Assign.To>
+                                                                                            <Assign.Value>
+                                                                                              <InArgument x:TypeArguments="x:String">[String.Format("The current week is too far from the delivery week so the delivery day will not pe added: {0}",sqlDeliveryDay.ToString("dd-MM-yyyy"))]</InArgument>
+                                                                                            </Assign.Value>
+                                                                                          </Assign>
+                                                                                          <Assign DisplayName="deliveryDayIsNothing" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_71">
+                                                                                            <Assign.To>
+                                                                                              <OutArgument x:TypeArguments="s:DateTime">[sqlDeliveryDay]</OutArgument>
+                                                                                            </Assign.To>
+                                                                                            <Assign.Value>
+                                                                                              <InArgument x:TypeArguments="s:DateTime">[datetime.MinValue]</InArgument>
+                                                                                            </Assign.Value>
+                                                                                          </Assign>
+                                                                                        </Sequence>
+                                                                                      </If.Then>
+                                                                                      <If.Else>
+                                                                                        <Sequence sap:VirtualizedContainerService.HintSize="1044,742" sap2010:WorkflowViewState.IdRef="Sequence_23">
+                                                                                          <Sequence.Variables>
+                                                                                            <Variable x:TypeArguments="x:Int32" Name="weekOfDeliveryDay" />
+                                                                                          </Sequence.Variables>
+                                                                                          <sap:WorkflowViewStateService.ViewState>
+                                                                                            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                                              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                                            </scg:Dictionary>
+                                                                                          </sap:WorkflowViewStateService.ViewState>
+                                                                                          <If Condition="[convert.ToInt32(deliveryWeek) - currentWeekOfYear &lt; 0]" DisplayName="ifWeeksInDifferentYears" sap:VirtualizedContainerService.HintSize="1002,650" sap2010:WorkflowViewState.IdRef="If_20">
+                                                                                            <If.Then>
+                                                                                              <If Condition="[convert.ToInt32(deliveryWeek)  - (convert.ToInt32(deliveryWeek) - currentWeekOfYear ) &gt; 2]" sap:VirtualizedContainerService.HintSize="653,501" sap2010:WorkflowViewState.IdRef="If_19">
+                                                                                                <If.Then>
+                                                                                                  <Sequence sap:VirtualizedContainerService.HintSize="304,252" sap2010:WorkflowViewState.IdRef="Sequence_35">
+                                                                                                    <sap:WorkflowViewStateService.ViewState>
+                                                                                                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                                                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                                                      </scg:Dictionary>
+                                                                                                    </sap:WorkflowViewStateService.ViewState>
+                                                                                                    <Assign DisplayName="assignDateWebPortalGreater" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_59">
+                                                                                                      <Assign.To>
+                                                                                                        <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Error Message")]</OutArgument>
+                                                                                                      </Assign.To>
+                                                                                                      <Assign.Value>
+                                                                                                        <InArgument x:TypeArguments="x:String">[String.Format("The current week is too far from the delivery week so the delivery day will not pe added: {0}",sqlDeliveryDay.ToString("dd-MM-yyyy"))]</InArgument>
+                                                                                                      </Assign.Value>
+                                                                                                    </Assign>
+                                                                                                    <Assign DisplayName="deliveryDayIsNothing" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_72">
+                                                                                                      <Assign.To>
+                                                                                                        <OutArgument x:TypeArguments="s:DateTime">[sqlDeliveryDay]</OutArgument>
+                                                                                                      </Assign.To>
+                                                                                                      <Assign.Value>
+                                                                                                        <InArgument x:TypeArguments="s:DateTime">[datetime.MinValue]</InArgument>
+                                                                                                      </Assign.Value>
+                                                                                                    </Assign>
+                                                                                                  </Sequence>
+                                                                                                </If.Then>
+                                                                                                <If.Else>
+                                                                                                  <Sequence sap:VirtualizedContainerService.HintSize="304,352" sap2010:WorkflowViewState.IdRef="Sequence_29">
+                                                                                                    <sap:WorkflowViewStateService.ViewState>
+                                                                                                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                                                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                                                      </scg:Dictionary>
+                                                                                                    </sap:WorkflowViewStateService.ViewState>
+                                                                                                    <Assign DisplayName="assignCalendarDeliveryDay" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_60">
+                                                                                                      <Assign.To>
+                                                                                                        <OutArgument x:TypeArguments="x:String">[calendarDeliveryDay]</OutArgument>
+                                                                                                      </Assign.To>
+                                                                                                      <Assign.Value>
+                                                                                                        <InArgument x:TypeArguments="x:String">[sqlDeliveryDay.ToString("dd")]</InArgument>
+                                                                                                      </Assign.Value>
+                                                                                                    </Assign>
+                                                                                                    <Assign DisplayName="assignCalendarDeliveryMonth" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_61">
+                                                                                                      <Assign.To>
+                                                                                                        <OutArgument x:TypeArguments="x:String">[calendarDeliveryMonth]</OutArgument>
+                                                                                                      </Assign.To>
+                                                                                                      <Assign.Value>
+                                                                                                        <InArgument x:TypeArguments="x:String">[sqlDeliveryDay.ToString("MM")]</InArgument>
+                                                                                                      </Assign.Value>
+                                                                                                    </Assign>
+                                                                                                    <Assign DisplayName="assignReportDeliveryDay" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_62">
+                                                                                                      <Assign.To>
+                                                                                                        <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Delivery Day")]</OutArgument>
+                                                                                                      </Assign.To>
+                                                                                                      <Assign.Value>
+                                                                                                        <InArgument x:TypeArguments="x:String">[sqlDeliveryDay.ToString("dd.MM.yyyy")]</InArgument>
+                                                                                                      </Assign.Value>
+                                                                                                    </Assign>
+                                                                                                  </Sequence>
+                                                                                                </If.Else>
+                                                                                              </If>
+                                                                                            </If.Then>
+                                                                                            <If.Else>
+                                                                                              <Sequence sap:VirtualizedContainerService.HintSize="304,352" sap2010:WorkflowViewState.IdRef="Sequence_28">
+                                                                                                <sap:WorkflowViewStateService.ViewState>
+                                                                                                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                                                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                                                  </scg:Dictionary>
+                                                                                                </sap:WorkflowViewStateService.ViewState>
+                                                                                                <Assign DisplayName="assignCalendarDeliveryDay" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_56">
+                                                                                                  <Assign.To>
+                                                                                                    <OutArgument x:TypeArguments="x:String">[calendarDeliveryDay]</OutArgument>
+                                                                                                  </Assign.To>
+                                                                                                  <Assign.Value>
+                                                                                                    <InArgument x:TypeArguments="x:String">[sqlDeliveryDay.ToString("dd")]</InArgument>
+                                                                                                  </Assign.Value>
+                                                                                                </Assign>
+                                                                                                <Assign DisplayName="assignCalendarDeliveryMonth" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_57">
+                                                                                                  <Assign.To>
+                                                                                                    <OutArgument x:TypeArguments="x:String">[calendarDeliveryMonth]</OutArgument>
+                                                                                                  </Assign.To>
+                                                                                                  <Assign.Value>
+                                                                                                    <InArgument x:TypeArguments="x:String">[sqlDeliveryDay.ToString("MM")]</InArgument>
+                                                                                                  </Assign.Value>
+                                                                                                </Assign>
+                                                                                                <Assign DisplayName="assignReportDeliveryDay" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_58">
+                                                                                                  <Assign.To>
+                                                                                                    <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Delivery Day")]</OutArgument>
+                                                                                                  </Assign.To>
+                                                                                                  <Assign.Value>
+                                                                                                    <InArgument x:TypeArguments="x:String">[sqlDeliveryDay.ToString("dd.MM.yyyy")]</InArgument>
+                                                                                                  </Assign.Value>
+                                                                                                </Assign>
+                                                                                              </Sequence>
+                                                                                            </If.Else>
+                                                                                          </If>
+                                                                                        </Sequence>
+                                                                                      </If.Else>
+                                                                                    </If>
+                                                                                  </If.Else>
+                                                                                </If>
+                                                                              </Sequence>
+                                                                            </ui:CommentOut.Body>
+                                                                          </ui:CommentOut>
+                                                                          <Assign DisplayName="deliveryDayIsNothing" sap:VirtualizedContainerService.HintSize="436,60" sap2010:WorkflowViewState.IdRef="Assign_80">
+                                                                            <Assign.To>
+                                                                              <OutArgument x:TypeArguments="s:DateTime">[sqlDeliveryDay]</OutArgument>
+                                                                            </Assign.To>
+                                                                            <Assign.Value>
+                                                                              <InArgument x:TypeArguments="s:DateTime">[datetime.MinValue]</InArgument>
+                                                                            </Assign.Value>
+                                                                          </Assign>
+                                                                          <Assign DisplayName="assignDateWebPortalGreater" sap:VirtualizedContainerService.HintSize="436,60" sap2010:WorkflowViewState.IdRef="Assign_81">
+                                                                            <Assign.To>
+                                                                              <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Error Message")]</OutArgument>
+                                                                            </Assign.To>
+                                                                            <Assign.Value>
+                                                                              <InArgument x:TypeArguments="x:String" xml:space="preserve">[String.Format("There was already a date in  Webportal: {0}", DeliveryDay)]</InArgument>
+                                                                            </Assign.Value>
+                                                                          </Assign>
+                                                                          <ui:LogMessage DisplayName="Log Message" sap:VirtualizedContainerService.HintSize="436,93" sap2010:WorkflowViewState.IdRef="LogMessage_12" Level="Info" Message="[&quot;There was already a date in  Webportal&quot;]" />
+                                                                        </Sequence>
+                                                                      </If.Then>
+                                                                      <If.Else>
+                                                                        <Sequence sap:VirtualizedContainerService.HintSize="1044,744" sap2010:WorkflowViewState.IdRef="Sequence_32">
+                                                                          <Sequence.Variables>
+                                                                            <Variable x:TypeArguments="x:Int32" Name="weekOfDeliveryDay" />
+                                                                          </Sequence.Variables>
+                                                                          <sap:WorkflowViewStateService.ViewState>
+                                                                            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                            </scg:Dictionary>
+                                                                          </sap:WorkflowViewStateService.ViewState>
+                                                                          <If Condition="[convert.ToInt32(deliveryWeek) - currentWeekOfYear &lt; 0]" DisplayName="ifWeeksInDifferentYears" sap:VirtualizedContainerService.HintSize="1002,652" sap2010:WorkflowViewState.IdRef="If_22">
+                                                                            <If.Then>
+                                                                              <If Condition="[convert.ToInt32(deliveryWeek)  - (convert.ToInt32(deliveryWeek) - currentWeekOfYear ) &gt; 2]" sap:VirtualizedContainerService.HintSize="653,502" sap2010:WorkflowViewState.IdRef="If_21">
+                                                                                <If.Then>
+                                                                                  <Sequence sap:VirtualizedContainerService.HintSize="304,252" sap2010:WorkflowViewState.IdRef="Sequence_36">
+                                                                                    <sap:WorkflowViewStateService.ViewState>
+                                                                                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                                      </scg:Dictionary>
+                                                                                    </sap:WorkflowViewStateService.ViewState>
+                                                                                    <Assign DisplayName="assignDateWebPortalGreater" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_63">
+                                                                                      <Assign.To>
+                                                                                        <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Error Message")]</OutArgument>
+                                                                                      </Assign.To>
+                                                                                      <Assign.Value>
+                                                                                        <InArgument x:TypeArguments="x:String">[String.Format("The current week is too far from the delivery week so the delivery day will not pe added: {0}",sqlDeliveryDay.ToString("dd-MM-yyyy"))]</InArgument>
+                                                                                      </Assign.Value>
+                                                                                    </Assign>
+                                                                                    <Assign DisplayName="deliveryDayIsNothing" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_73">
+                                                                                      <Assign.To>
+                                                                                        <OutArgument x:TypeArguments="s:DateTime">[sqlDeliveryDay]</OutArgument>
+                                                                                      </Assign.To>
+                                                                                      <Assign.Value>
+                                                                                        <InArgument x:TypeArguments="s:DateTime">[datetime.MinValue]</InArgument>
+                                                                                      </Assign.Value>
+                                                                                    </Assign>
+                                                                                  </Sequence>
+                                                                                </If.Then>
+                                                                                <If.Else>
+                                                                                  <Sequence sap:VirtualizedContainerService.HintSize="304,352" sap2010:WorkflowViewState.IdRef="Sequence_30">
+                                                                                    <sap:WorkflowViewStateService.ViewState>
+                                                                                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                                      </scg:Dictionary>
+                                                                                    </sap:WorkflowViewStateService.ViewState>
+                                                                                    <Assign DisplayName="assignCalendarDeliveryDay" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_64">
+                                                                                      <Assign.To>
+                                                                                        <OutArgument x:TypeArguments="x:String">[calendarDeliveryDay]</OutArgument>
+                                                                                      </Assign.To>
+                                                                                      <Assign.Value>
+                                                                                        <InArgument x:TypeArguments="x:String">[sqlDeliveryDay.ToString("dd")]</InArgument>
+                                                                                      </Assign.Value>
+                                                                                    </Assign>
+                                                                                    <Assign DisplayName="assignCalendarDeliveryMonth" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_65">
+                                                                                      <Assign.To>
+                                                                                        <OutArgument x:TypeArguments="x:String">[calendarDeliveryMonth]</OutArgument>
+                                                                                      </Assign.To>
+                                                                                      <Assign.Value>
+                                                                                        <InArgument x:TypeArguments="x:String">[sqlDeliveryDay.ToString("MM")]</InArgument>
+                                                                                      </Assign.Value>
+                                                                                    </Assign>
+                                                                                    <Assign DisplayName="assignReportDeliveryDay" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_66">
+                                                                                      <Assign.To>
+                                                                                        <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Delivery Day")]</OutArgument>
+                                                                                      </Assign.To>
+                                                                                      <Assign.Value>
+                                                                                        <InArgument x:TypeArguments="x:String">[sqlDeliveryDay.ToString("dd.MM.yyyy")]</InArgument>
+                                                                                      </Assign.Value>
+                                                                                    </Assign>
+                                                                                  </Sequence>
+                                                                                </If.Else>
+                                                                              </If>
+                                                                            </If.Then>
+                                                                            <If.Else>
+                                                                              <Sequence sap:VirtualizedContainerService.HintSize="304,352" sap2010:WorkflowViewState.IdRef="Sequence_31">
+                                                                                <sap:WorkflowViewStateService.ViewState>
+                                                                                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                                  </scg:Dictionary>
+                                                                                </sap:WorkflowViewStateService.ViewState>
+                                                                                <Assign DisplayName="assignCalendarDeliveryDay" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_67">
+                                                                                  <Assign.To>
+                                                                                    <OutArgument x:TypeArguments="x:String">[calendarDeliveryDay]</OutArgument>
+                                                                                  </Assign.To>
+                                                                                  <Assign.Value>
+                                                                                    <InArgument x:TypeArguments="x:String">[sqlDeliveryDay.ToString("dd")]</InArgument>
+                                                                                  </Assign.Value>
+                                                                                </Assign>
+                                                                                <Assign DisplayName="assignCalendarDeliveryMonth" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_68">
+                                                                                  <Assign.To>
+                                                                                    <OutArgument x:TypeArguments="x:String">[calendarDeliveryMonth]</OutArgument>
+                                                                                  </Assign.To>
+                                                                                  <Assign.Value>
+                                                                                    <InArgument x:TypeArguments="x:String">[sqlDeliveryDay.ToString("MM")]</InArgument>
+                                                                                  </Assign.Value>
+                                                                                </Assign>
+                                                                                <Assign DisplayName="assignReportDeliveryDay" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_69">
+                                                                                  <Assign.To>
+                                                                                    <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Delivery Day")]</OutArgument>
+                                                                                  </Assign.To>
+                                                                                  <Assign.Value>
+                                                                                    <InArgument x:TypeArguments="x:String">[sqlDeliveryDay.ToString("dd.MM.yyyy")]</InArgument>
+                                                                                  </Assign.Value>
+                                                                                </Assign>
+                                                                              </Sequence>
+                                                                            </If.Else>
+                                                                          </If>
+                                                                        </Sequence>
+                                                                      </If.Else>
+                                                                    </If>
+                                                                  </Sequence>
+                                                                </If.Else>
+                                                              </If>
+                                                            </If.Then>
+                                                            <If.Else>
+                                                              <Sequence sap:VirtualizedContainerService.HintSize="376,285" sap2010:WorkflowViewState.IdRef="Sequence_25">
+                                                                <sap:WorkflowViewStateService.ViewState>
+                                                                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                  </scg:Dictionary>
+                                                                </sap:WorkflowViewStateService.ViewState>
+                                                                <ui:LogMessage DisplayName="Log Message" sap:VirtualizedContainerService.HintSize="334,93" sap2010:WorkflowViewState.IdRef="LogMessage_10" Level="Info" Message="[&quot;delivery day 1900&quot;]" />
+                                                                <Assign DisplayName="deliveryDayIsNothing" sap:VirtualizedContainerService.HintSize="334,60" sap2010:WorkflowViewState.IdRef="Assign_54">
+                                                                  <Assign.To>
+                                                                    <OutArgument x:TypeArguments="s:DateTime">[sqlDeliveryDay]</OutArgument>
+                                                                  </Assign.To>
+                                                                  <Assign.Value>
+                                                                    <InArgument x:TypeArguments="s:DateTime">[DateTime.MinValue]</InArgument>
+                                                                  </Assign.Value>
+                                                                </Assign>
+                                                              </Sequence>
+                                                            </If.Else>
+                                                          </If>
+                                                        </Sequence>
+                                                        <FlowStep.Next>
+                                                          <FlowDecision x:Name="__ReferenceID16" Condition="[not sqlDeliveryDay = Datetime.MinValue]" DisplayName="Flow Decision" sap:VirtualizedContainerService.HintSize="79,87" sap2010:WorkflowViewState.IdRef="FlowDecision_15">
+                                                            <sap:WorkflowViewStateService.ViewState>
+                                                              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                <av:Point x:Key="ShapeLocation">1120.5,1566.5</av:Point>
+                                                                <av:Size x:Key="ShapeSize">79,87</av:Size>
+                                                                <av:PointCollection x:Key="TrueConnector">1120.5,1610 1090.5,1610 1090.5,1620.5 930,1620.5</av:PointCollection>
+                                                              </scg:Dictionary>
+                                                            </sap:WorkflowViewStateService.ViewState>
+                                                            <FlowDecision.True>
+                                                              <FlowStep x:Name="__ReferenceID17">
+                                                                <sap:WorkflowViewStateService.ViewState>
+                                                                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                    <av:Point x:Key="ShapeLocation">730,1594.5</av:Point>
+                                                                    <av:Size x:Key="ShapeSize">200,52</av:Size>
+                                                                    <av:PointCollection x:Key="ConnectorLocation">830,1646.5 830,1687</av:PointCollection>
+                                                                  </scg:Dictionary>
+                                                                </sap:WorkflowViewStateService.ViewState>
+                                                                <ui:LogMessage DisplayName="Log Message" sap:VirtualizedContainerService.HintSize="200,52" sap2010:WorkflowViewState.IdRef="LogMessage_11" Level="Warn" Message="[&quot;will search for deliveryday&quot;]">
+                                                                  <sap:WorkflowViewStateService.ViewState>
+                                                                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                    </scg:Dictionary>
+                                                                  </sap:WorkflowViewStateService.ViewState>
+                                                                </ui:LogMessage>
+                                                                <FlowStep.Next>
+                                                                  <FlowStep x:Name="__ReferenceID15">
+                                                                    <sap:WorkflowViewStateService.ViewState>
+                                                                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                        <av:Point x:Key="ShapeLocation">730,1687</av:Point>
+                                                                        <av:Size x:Key="ShapeSize">200,68</av:Size>
+                                                                      </scg:Dictionary>
+                                                                    </sap:WorkflowViewStateService.ViewState>
+                                                                    <Sequence DisplayName="addDeliveryDay" sap:VirtualizedContainerService.HintSize="200,68" sap2010:WorkflowViewState.IdRef="Sequence_27">
+                                                                      <sap:WorkflowViewStateService.ViewState>
+                                                                        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                        </scg:Dictionary>
+                                                                      </sap:WorkflowViewStateService.ViewState>
+                                                                      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WebPortal_NavigateToMyDeliveries workflow" sap:VirtualizedContainerService.HintSize="379,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_53" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="WebPortal\WebPortal_NavigateToMyDeliveries.xaml">
+                                                                        <ui:InvokeWorkflowFile.Arguments>
+                                                                          <scg:Dictionary x:TypeArguments="x:String, Argument" />
+                                                                        </ui:InvokeWorkflowFile.Arguments>
+                                                                        <sap:WorkflowViewStateService.ViewState>
+                                                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                          </scg:Dictionary>
+                                                                        </sap:WorkflowViewStateService.ViewState>
+                                                                      </ui:InvokeWorkflowFile>
+                                                                      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WebPortal_SearchOrderOrDelivery workflow" sap:VirtualizedContainerService.HintSize="379,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_54" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="WebPortal\WebPortal_SearchOrderOrDelivery.xaml">
+                                                                        <ui:InvokeWorkflowFile.Arguments>
+                                                                          <InArgument x:TypeArguments="x:String" x:Key="in_OrderOrDelivery">[in_TransactionItem.Reference]</InArgument>
+                                                                          <InArgument x:TypeArguments="x:String" x:Key="in_CustomerReference">[customerReference]</InArgument>
+                                                                        </ui:InvokeWorkflowFile.Arguments>
+                                                                        <sap:WorkflowViewStateService.ViewState>
+                                                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                          </scg:Dictionary>
+                                                                        </sap:WorkflowViewStateService.ViewState>
+                                                                      </ui:InvokeWorkflowFile>
+                                                                      <ui:Click AlterIfDisabled="{x:Null}" DelayMS="{x:Null}" SendWindowMessages="{x:Null}" ClickType="CLICK_SINGLE" DelayBefore="1000" DisplayName="selectAllOrders" sap:VirtualizedContainerService.HintSize="379,106" sap2010:WorkflowViewState.IdRef="Click_6" KeyModifiers="None" MouseButton="BTN_LEFT" SimulateClick="True">
+                                                                        <ui:Click.CursorPosition>
+                                                                          <ui:CursorPosition Position="Center">
+                                                                            <ui:CursorPosition.OffsetX>
+                                                                              <InArgument x:TypeArguments="x:Int32" />
+                                                                            </ui:CursorPosition.OffsetX>
+                                                                            <ui:CursorPosition.OffsetY>
+                                                                              <InArgument x:TypeArguments="x:Int32" />
+                                                                            </ui:CursorPosition.OffsetY>
+                                                                          </ui:CursorPosition>
+                                                                        </ui:Click.CursorPosition>
+                                                                        <ui:Click.Target>
+                                                                          <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" Id="00ddf2b3-fc43-4abe-a4a8-ed0b1daa7ab6" InformativeScreenshot="97d591b9bfb389c05e219e65edf22a4a" Selector="&lt;html app='chrome.exe' title='Mijn leveringen' /&gt;&lt;webctrl id='CKB_SELECTEREN_TOTAAL' tag='INPUT' /&gt;">
+                                                                            <ui:Target.TimeoutMS>
+                                                                              <InArgument x:TypeArguments="x:Int32" />
+                                                                            </ui:Target.TimeoutMS>
+                                                                            <ui:Target.WaitForReady>
+                                                                              <InArgument x:TypeArguments="ui:WaitForReady" />
+                                                                            </ui:Target.WaitForReady>
+                                                                          </ui:Target>
+                                                                        </ui:Click.Target>
+                                                                        <sap:WorkflowViewStateService.ViewState>
+                                                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                          </scg:Dictionary>
+                                                                        </sap:WorkflowViewStateService.ViewState>
+                                                                      </ui:Click>
+                                                                      <ui:Click AlterIfDisabled="{x:Null}" DelayMS="{x:Null}" SendWindowMessages="{x:Null}" ClickType="CLICK_SINGLE" DelayBefore="2000" DisplayName="clickCalendar" sap:VirtualizedContainerService.HintSize="379,106" sap2010:WorkflowViewState.IdRef="Click_7" KeyModifiers="None" MouseButton="BTN_LEFT" SimulateClick="True">
+                                                                        <ui:Click.CursorPosition>
+                                                                          <ui:CursorPosition Position="Center">
+                                                                            <ui:CursorPosition.OffsetX>
+                                                                              <InArgument x:TypeArguments="x:Int32" />
+                                                                            </ui:CursorPosition.OffsetX>
+                                                                            <ui:CursorPosition.OffsetY>
+                                                                              <InArgument x:TypeArguments="x:Int32" />
+                                                                            </ui:CursorPosition.OffsetY>
+                                                                          </ui:CursorPosition>
+                                                                        </ui:Click.CursorPosition>
+                                                                        <ui:Click.Target>
+                                                                          <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" Id="dee4626e-5cdd-4f06-9b8e-998fe95b9d15" InformativeScreenshot="5bde11456ac01f4473149ef984e984a3" Selector="&lt;html app='chrome.exe' title='Mijn leveringen' /&gt;&lt;webctrl id='BTN_TOTAAL_PLANNEN' tag='INPUT' /&gt;">
+                                                                            <ui:Target.TimeoutMS>
+                                                                              <InArgument x:TypeArguments="x:Int32" />
+                                                                            </ui:Target.TimeoutMS>
+                                                                            <ui:Target.WaitForReady>
+                                                                              <InArgument x:TypeArguments="ui:WaitForReady" />
+                                                                            </ui:Target.WaitForReady>
+                                                                          </ui:Target>
+                                                                        </ui:Click.Target>
+                                                                        <sap:WorkflowViewStateService.ViewState>
+                                                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                          </scg:Dictionary>
+                                                                        </sap:WorkflowViewStateService.ViewState>
+                                                                      </ui:Click>
+                                                                      <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WebPortal_SelectDate workflow" sap:VirtualizedContainerService.HintSize="379,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_55" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="WebPortal\WebPortal_SelectDate.xaml">
+                                                                        <ui:InvokeWorkflowFile.Arguments>
+                                                                          <InArgument x:TypeArguments="x:String" x:Key="in_Day">[calendarDeliveryDay]</InArgument>
+                                                                          <InArgument x:TypeArguments="x:String" x:Key="in_Month">[calendarDeliveryMonth]</InArgument>
+                                                                        </ui:InvokeWorkflowFile.Arguments>
+                                                                        <sap:WorkflowViewStateService.ViewState>
+                                                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                                          </scg:Dictionary>
+                                                                        </sap:WorkflowViewStateService.ViewState>
+                                                                      </ui:InvokeWorkflowFile>
+                                                                      <ui:Click AlterIfDisabled="{x:Null}" DelayMS="{x:Null}" SendWindowMessages="{x:Null}" ClickType="CLICK_SINGLE" DelayBefore="1000" DisplayName="unselectAllOrders" sap:VirtualizedContainerService.HintSize="379,106" sap2010:WorkflowViewState.IdRef="Click_8" KeyModifiers="None" MouseButton="BTN_LEFT" SimulateClick="True">
+                                                                        <ui:Click.CursorPosition>
+                                                                          <ui:CursorPosition Position="Center">
+                                                                            <ui:CursorPosition.OffsetX>
+                                                                              <InArgument x:TypeArguments="x:Int32" />
+                                                                            </ui:CursorPosition.OffsetX>
+                                                                            <ui:CursorPosition.OffsetY>
+                                                                              <InArgument x:TypeArguments="x:Int32" />
+                                                                            </ui:CursorPosition.OffsetY>
+                                                                          </ui:CursorPosition>
+                                                                        </ui:Click.CursorPosition>
+                                                                        <ui:Click.Target>
+                                                                          <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" Id="9e631caf-04b3-449a-9f53-1a3b72101662" InformativeScreenshot="8fbd8cbea0cc2624c28d8e1743f7ad3c" Selector="&lt;html app='chrome.exe' title='Mijn leveringen' /&gt;&lt;webctrl id='CKB_SELECTEREN_TOTAAL' tag='INPUT' /&gt;">
+                                                                            <ui:Target.TimeoutMS>
+                                                                              <InArgument x:TypeArguments="x:Int32" />
+                                                                            </ui:Target.TimeoutMS>
+                                                                            <ui:Target.WaitForReady>
+                                                                              <InArgument x:TypeArguments="ui:WaitForReady" />
+                                                                            </ui:Target.WaitForReady>
+                                                                          </ui:Target>
+                                                                        </ui:Click.Target>
+                                                                      </ui:Click>
+                                                                    </Sequence>
+                                                                  </FlowStep>
+                                                                </FlowStep.Next>
+                                                              </FlowStep>
+                                                            </FlowDecision.True>
+                                                          </FlowDecision>
+                                                        </FlowStep.Next>
+                                                      </FlowStep>
+                                                    </FlowStep.Next>
+                                                  </FlowStep>
+                                                </FlowStep.Next>
+                                              </FlowStep>
+                                            </FlowDecision.True>
+                                            <FlowDecision.False>
+                                              <x:Reference>__ReferenceID2</x:Reference>
+                                            </FlowDecision.False>
+                                          </FlowDecision>
+                                        </FlowDecision.True>
+                                        <FlowDecision.False>
+                                          <x:Reference>__ReferenceID3</x:Reference>
+                                        </FlowDecision.False>
+                                      </FlowDecision>
+                                    </FlowDecision.True>
+                                    <FlowDecision.False>
+                                      <x:Reference>__ReferenceID2</x:Reference>
+                                    </FlowDecision.False>
+                                  </FlowDecision>
+                                </FlowDecision.True>
+                                <FlowDecision.False>
+                                  <x:Reference>__ReferenceID2</x:Reference>
+                                </FlowDecision.False>
+                              </FlowDecision>
+                            </FlowDecision.False>
+                          </FlowDecision>
+                        </FlowStep.Next>
+                      </FlowStep>
+                    </FlowStep.Next>
+                  </FlowStep>
+                </FlowDecision.True>
+                <FlowDecision.False>
+                  <FlowDecision x:Name="__ReferenceID8" Condition="[dtSQLQuery.Rows.Count = 0]" DisplayName="Flow Decision" sap:VirtualizedContainerService.HintSize="79,87" sap2010:WorkflowViewState.IdRef="FlowDecision_2">
+                    <sap:WorkflowViewStateService.ViewState>
+                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                        <av:Point x:Key="ShapeLocation">740.5,386.5</av:Point>
+                        <av:Size x:Key="ShapeSize">79,87</av:Size>
+                        <av:PointCollection x:Key="TrueConnector">740.5,430 710.5,430 710.5,600 849,600</av:PointCollection>
+                        <av:PointCollection x:Key="FalseConnector">819.5,430 980,430 980,470</av:PointCollection>
+                      </scg:Dictionary>
+                    </sap:WorkflowViewStateService.ViewState>
+                    <FlowDecision.True>
+                      <FlowStep x:Name="__ReferenceID10">
+                        <sap:WorkflowViewStateService.ViewState>
+                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                            <av:Point x:Key="ShapeLocation">849,570</av:Point>
+                            <av:Size x:Key="ShapeSize">262,60</av:Size>
+                            <av:PointCollection x:Key="ConnectorLocation">1111,600 1141,600 1141,500.02 1190,500.02</av:PointCollection>
+                          </scg:Dictionary>
+                        </sap:WorkflowViewStateService.ViewState>
+                        <Assign DisplayName="assignExceptionNoRows" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_10">
+                          <Assign.To>
+                            <OutArgument x:TypeArguments="x:String">[exceptionMessage]</OutArgument>
+                          </Assign.To>
+                          <Assign.Value>
+                            <InArgument x:TypeArguments="x:String">[String.Format("For the {0} with the customer reference {1} the robot found 0 rows in the AX database.",in_TransactionItem.Reference, customerReference)]</InArgument>
+                          </Assign.Value>
+                          <sap:WorkflowViewStateService.ViewState>
+                            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                            </scg:Dictionary>
+                          </sap:WorkflowViewStateService.ViewState>
+                        </Assign>
+                        <FlowStep.Next>
+                          <FlowStep x:Name="__ReferenceID4">
+                            <sap:WorkflowViewStateService.ViewState>
+                              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                <av:Point x:Key="ShapeLocation">1190,474.02</av:Point>
+                                <av:Size x:Key="ShapeSize">200,52</av:Size>
+                                <av:PointCollection x:Key="ConnectorLocation">1290,526.02 1290,576.02</av:PointCollection>
+                              </scg:Dictionary>
+                            </sap:WorkflowViewStateService.ViewState>
+                            <ui:LogMessage DisplayName="err_TransactionProcess" sap:VirtualizedContainerService.HintSize="200,52" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Error" Message="[exceptionMessage]">
+                              <sap:WorkflowViewStateService.ViewState>
+                                <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                  <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                </scg:Dictionary>
+                              </sap:WorkflowViewStateService.ViewState>
+                            </ui:LogMessage>
+                            <FlowStep.Next>
+                              <FlowStep x:Name="__ReferenceID11">
+                                <sap:WorkflowViewStateService.ViewState>
+                                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                    <av:Point x:Key="ShapeLocation">1190,576.02</av:Point>
+                                    <av:Size x:Key="ShapeSize">200,22</av:Size>
+                                  </scg:Dictionary>
+                                </sap:WorkflowViewStateService.ViewState>
+                                <Throw DisplayName="throwTransactionProcessBR" Exception="[new BusinessRuleException(exceptionMessage)]" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="Throw_1">
+                                  <sap:WorkflowViewStateService.ViewState>
+                                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                    </scg:Dictionary>
+                                  </sap:WorkflowViewStateService.ViewState>
+                                </Throw>
+                              </FlowStep>
+                            </FlowStep.Next>
+                          </FlowStep>
+                        </FlowStep.Next>
+                      </FlowStep>
+                    </FlowDecision.True>
+                    <FlowDecision.False>
+                      <FlowStep x:Name="__ReferenceID9">
+                        <sap:WorkflowViewStateService.ViewState>
+                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                            <av:Point x:Key="ShapeLocation">849,470</av:Point>
+                            <av:Size x:Key="ShapeSize">262,60</av:Size>
+                            <av:PointCollection x:Key="ConnectorLocation">1111,500 1141,500 1141,500.02 1190,500.02</av:PointCollection>
+                          </scg:Dictionary>
+                        </sap:WorkflowViewStateService.ViewState>
+                        <Assign DisplayName="assignExceptionMultipleRows" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_11">
+                          <Assign.To>
+                            <OutArgument x:TypeArguments="x:String">[exceptionMessage]</OutArgument>
+                          </Assign.To>
+                          <Assign.Value>
+                            <InArgument x:TypeArguments="x:String">[String.Format("For the {0} with the customer reference {1} the robot found multiple rows in the AX database.",in_TransactionItem.Reference, customerReference)]</InArgument>
+                          </Assign.Value>
+                          <sap:WorkflowViewStateService.ViewState>
+                            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                            </scg:Dictionary>
+                          </sap:WorkflowViewStateService.ViewState>
+                        </Assign>
+                        <FlowStep.Next>
+                          <x:Reference>__ReferenceID4</x:Reference>
+                        </FlowStep.Next>
+                      </FlowStep>
+                    </FlowDecision.False>
+                  </FlowDecision>
+                </FlowDecision.False>
+              </FlowDecision>
+            </FlowStep.Next>
+          </FlowStep>
+          <FlowStep x:Name="__ReferenceID23">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <av:Point x:Key="ShapeLocation">520,109.58</av:Point>
+                <av:Size x:Key="ShapeSize">200,68</av:Size>
+                <av:PointCollection x:Key="ConnectorLocation">620,177.58 620,217.5</av:PointCollection>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+            <Sequence DisplayName="init()" sap:VirtualizedContainerService.HintSize="200,68" sap2010:WorkflowViewState.IdRef="Sequence_2">
+              <sap:WorkflowViewStateService.ViewState>
+                <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                  <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                </scg:Dictionary>
+              </sap:WorkflowViewStateService.ViewState>
+              <Assign DisplayName="initReferenceCutoff" sap:VirtualizedContainerService.HintSize="484,60" sap2010:WorkflowViewState.IdRef="Assign_32">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:Int32">[referenceCutoff]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:Int32">[Convert.ToInt32(in_Config("referenceCutOff").ToString)]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="initExceptionMessage" sap:VirtualizedContainerService.HintSize="484,60" sap2010:WorkflowViewState.IdRef="Assign_9">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[exceptionMessage]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[String.Empty]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="initCustomerRef" sap:VirtualizedContainerService.HintSize="484,60" sap2010:WorkflowViewState.IdRef="Assign_1">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[customerReference]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[in_TransactionItem.SpecificContent("customerRef").ToString]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="assignWeekOfYear" sap:VirtualizedContainerService.HintSize="484,60" sap2010:WorkflowViewState.IdRef="Assign_36">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:Int32">[currentWeekOfYear]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:Int32">[CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(System.DateTime.Now,CalendarWeekRule.FirstDay,DayOfWeek.Monday)]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke TrimCustomerReference workflow" sap:VirtualizedContainerService.HintSize="484,113" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_7" LogEntry="No" LogExit="No" UnSafe="False" WorkflowFileName="Misc\TrimCustomerReference.xaml">
+                <ui:InvokeWorkflowFile.Arguments>
+                  <InOutArgument x:TypeArguments="x:String" x:Key="customerReference">[customerReference]</InOutArgument>
+                </ui:InvokeWorkflowFile.Arguments>
+              </ui:InvokeWorkflowFile>
+              <Assign DisplayName="dictionaryCustomerReference" sap:VirtualizedContainerService.HintSize="484,60" sap2010:WorkflowViewState.IdRef="Assign_13">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Customer Reference")]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[customerReference]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="initDateOrdered" sap:VirtualizedContainerService.HintSize="484,60" sap2010:WorkflowViewState.IdRef="Assign_2">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[dateOrdered]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[in_TransactionItem.SpecificContent("dateOrdered").ToString]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="initReferenceWeek" sap:VirtualizedContainerService.HintSize="484,60" sap2010:WorkflowViewState.IdRef="Assign_3">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[referenceWeek]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[in_TransactionItem.SpecificContent("referenceWeek").ToString.Substring(in_TransactionItem.SpecificContent("referenceWeek").ToString.IndexOf("-")+1)]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="initReferenceYear" sap:VirtualizedContainerService.HintSize="484,60" sap2010:WorkflowViewState.IdRef="Assign_30">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[referenceYear]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[in_TransactionItem.SpecificContent("referenceWeek").ToString.Substring(0,4)]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="dictionaryReferenceWeek" sap:VirtualizedContainerService.HintSize="484,60" sap2010:WorkflowViewState.IdRef="Assign_15">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Reference Week")]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[referenceWeek]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <Assign DisplayName="assignRequestedWeek" sap:VirtualizedContainerService.HintSize="484,60" sap2010:WorkflowViewState.IdRef="Assign_4">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[requestedWeek]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[in_TransactionItem.SpecificContent("requestedWeek").ToString]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <If Condition="[in_TransactionItem.Reference.Equals(&quot;Delivery&quot;)]" DisplayName="ifDelivery" sap:VirtualizedContainerService.HintSize="484,802" sap2010:WorkflowViewState.IdRef="If_2">
+                <If.Then>
+                  <Sequence sap:VirtualizedContainerService.HintSize="304,652" sap2010:WorkflowViewState.IdRef="Sequence_3">
+                    <sap:WorkflowViewStateService.ViewState>
+                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                      </scg:Dictionary>
+                    </sap:WorkflowViewStateService.ViewState>
+                    <Assign DisplayName="assignConfirmationNumber" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_6">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:String">[confirmationNumber]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:String">[in_TransactionItem.SpecificContent("confirmationNumber").ToString]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                    <Assign DisplayName="dictionaryConfirmationNumber" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_16">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Confirmation number")]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:String">[confirmationNumber]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                    <Assign DisplayName="assignDeliveryWeek" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_7">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:String">[deliveryWeek]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:String">[in_TransactionItem.SpecificContent("deliveryWeek").ToString.Substring(in_TransactionItem.SpecificContent("deliveryWeek").ToString.IndexOf("-") + 1)]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                    <Assign DisplayName="dictionaryDeliveryWeek" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_17">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Delivery Week")]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:String">[deliveryWeek]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                    <Assign DisplayName="assignDeliveryDay" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_8">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:String">[deliveryDay]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:String">[in_TransactionItem.SpecificContent("deliveryDay").ToString]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                    <Assign DisplayName="dictionaryDeliveryDay" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_18">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Delivery Day")]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:String">[deliveryDay]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                  </Sequence>
+                </If.Then>
+              </If>
+              <If Condition="[in_transactionItem.Reference.ToUpper.Equals(&quot;DELIVERY&quot;)  AND String.IsNullOrEmpty(deliveryWeek)]" DisplayName="ifNoDeliveryWeekPortal" sap:VirtualizedContainerService.HintSize="484,364" sap2010:WorkflowViewState.IdRef="If_24">
+                <If.Then>
+                  <Sequence sap:VirtualizedContainerService.HintSize="304,214" sap2010:WorkflowViewState.IdRef="Sequence_48">
+                    <sap:WorkflowViewStateService.ViewState>
+                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                      </scg:Dictionary>
+                    </sap:WorkflowViewStateService.ViewState>
+                    <Assign DisplayName="assignDateWebPortalGreater" sap:VirtualizedContainerService.HintSize="262,60" sap2010:WorkflowViewState.IdRef="Assign_85">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:String">[io_reportDictionary("Error Message")]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:String">["Delivery without delivery week!"]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                    <Throw Exception="[new BusinessRuleException(io_reportDictionary(&quot;Error Message&quot;))]" sap:VirtualizedContainerService.HintSize="262,22" sap2010:WorkflowViewState.IdRef="Throw_2" />
+                  </Sequence>
+                </If.Then>
+              </If>
+            </Sequence>
+            <FlowStep.Next>
+              <x:Reference>__ReferenceID5</x:Reference>
+            </FlowStep.Next>
+          </FlowStep>
+          <x:Reference>__ReferenceID6</x:Reference>
+          <x:Reference>__ReferenceID7</x:Reference>
+          <x:Reference>__ReferenceID8</x:Reference>
+          <x:Reference>__ReferenceID9</x:Reference>
+          <x:Reference>__ReferenceID10</x:Reference>
+          <x:Reference>__ReferenceID4</x:Reference>
+          <x:Reference>__ReferenceID11</x:Reference>
+          <x:Reference>__ReferenceID12</x:Reference>
+          <x:Reference>__ReferenceID13</x:Reference>
+          <x:Reference>__ReferenceID14</x:Reference>
+          <x:Reference>__ReferenceID15</x:Reference>
+          <x:Reference>__ReferenceID16</x:Reference>
+          <x:Reference>__ReferenceID17</x:Reference>
+          <x:Reference>__ReferenceID2</x:Reference>
+          <x:Reference>__ReferenceID18</x:Reference>
+          <x:Reference>__ReferenceID19</x:Reference>
+          <x:Reference>__ReferenceID3</x:Reference>
+          <x:Reference>__ReferenceID20</x:Reference>
+          <x:Reference>__ReferenceID21</x:Reference>
+          <x:Reference>__ReferenceID22</x:Reference>
+        </Flowchart>
+      </If.Else>
+    </If>
+  </Sequence>
+</Activity>
